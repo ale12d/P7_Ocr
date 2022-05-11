@@ -7,7 +7,7 @@
 * [Setup Windows](#setup-windows)
 
 ## General info
-This project is an strategy investment optimization
+This project is a strategic investment optimization
 	
 ## Packages
 Project is created with:
