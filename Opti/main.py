@@ -1,5 +1,6 @@
 import csv
-
+import time
+import os, psutil
 
 def input_invest():
     while 1:
@@ -59,11 +60,17 @@ def algo(table_actions, invest_max):
 
 
 def main():
+    process = psutil.Process(os.getpid())
+
     invest_max = input_invest()
+    start = time.time()
     table_actions = open_data()
     solution = algo(table_actions, invest_max)
 
+    end = time.time()
     print(solution)
+    print("\n" + str(end - start) + " seconds")
+    print(str(process.memory_info().rss) + " bytes")
 
 
 if __name__ == "__main__":
