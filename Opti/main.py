@@ -1,12 +1,14 @@
 import csv
+import os
+import psutil
 import time
-import os, psutil
+
 
 def input_invest():
     while 1:
         invest_max = input()
-        if 0 <= int(invest_max) <= 500:
-            return int(invest_max)
+        if 0 <= float(invest_max) <= 500:
+            return float(invest_max)
         print("response between 0 and 500")
 
 
@@ -59,6 +61,28 @@ def algo(table_actions, invest_max):
     return solution
 
 
+def print_solution(solution):
+    actions_prices = []
+    actions_income = []
+    for nb_action in range(len(solution)):
+        print(
+            solution[nb_action]['name'] + " : " + solution[nb_action]['price'] + " $" + " --> " + solution[nb_action][
+                'profit'] + " %")
+        actions_prices.append(float(solution[nb_action]['price']))
+
+        actions_income.append(float(solution[nb_action]['price']) + (
+                    (float(solution[nb_action]['profit']) / 100) * float(solution[nb_action]['price'])))
+
+    invest = sum(actions_prices)
+    income = sum(actions_income)
+    profit_total = (income / invest) * 100
+
+    print("\n invest : " + str(round(invest, 2)) + " $")
+    print(" income : " + str(round(income, 2)) + " $")
+    print(" profit : " + "+" + str(round(profit_total - 100, 2)) + " %")
+    print("\n------")
+
+
 def main():
     process = psutil.Process(os.getpid())
 
@@ -68,7 +92,9 @@ def main():
     solution = algo(table_actions, invest_max)
 
     end = time.time()
-    print(solution)
+
+    print_solution(solution)
+
     print("\n" + str(end - start) + " seconds")
     print(str(process.memory_info().rss) + " bytes")
 
