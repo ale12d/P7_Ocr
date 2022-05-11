@@ -40,6 +40,7 @@ def find_all_combinations(table_actions, invest_max):
             pass
 
     list_prices = list(dicts.values())
+
     combinations = [seq for i in range(len(list_prices), 0, -1)
                     for seq in itertools.combinations(list_prices, i)
                     if float(invest_max) > sum(seq) > float(invest_max) * 0.80]
@@ -54,49 +55,53 @@ def calc_all_profit(combinations, dicts, table_actions):
         for nb_action in range(len(combinations[i])):
             list_names.append(list(dicts.keys())[list(dicts.values()).index(combinations[i][nb_action])])
 
-        actions = []
+        list_actions = []
 
         for y in range(len(list_names)):
             result = [(item for item in table_actions if item["name"] == list_names[y])]
             list_result = list(result[0])[0]
-            actions.append(list_result)
+            list_actions.append(list_result)
 
         price_combination = []
         invoice_combination = []
-        for item in range(len(actions)):
-            action_invoice = float(actions[item]["price"]) + (
-                    float(actions[item]["profit"]) / 100 * float(actions[item]["price"]))
+        for action in range(len(list_actions)):
+            action_invoice = float(list_actions[action]["price"]) + (
+                    float(list_actions[action]["profit"]) / 100 * float(list_actions[action]["price"]))
 
-            price_combination.append(float(actions[item]["price"]))
+            price_combination.append(float(list_actions[action]["price"]))
             invoice_combination.append(action_invoice)
 
         invoice_combinations = sum(invoice_combination)
         price_combinations = sum(price_combination)
 
         value = (invoice_combinations / price_combinations) * 100
-        dic_value[value] = actions
+        dic_value[value] = list_actions
 
     sorted_dict = {k: dic_value[k] for k in sorted(dic_value, reverse=True)}
 
     solution = sorted_dict[list(sorted_dict.keys())[0]]
-    return solution, sorted_dict
+    return solution
 
 
-def print_solution(solution, sorted_dict):
+def print_solution(solution):
     actions_prices = []
+    actions_income = []
     for nb_action in range(len(solution)):
         print(
             solution[nb_action]['name'] + " : " + solution[nb_action]['price'] + " $" + " --> " + solution[nb_action][
                 'profit'] + " %")
         actions_prices.append(float(solution[nb_action]['price']))
 
+        actions_income.append(float(solution[nb_action]['price']) + (
+                    (float(solution[nb_action]['profit']) / 100) * float(solution[nb_action]['price'])))
+
     invest = sum(actions_prices)
-    income = invest * (list(sorted_dict.keys())[0] / 100)
-    profit = list(sorted_dict.keys())[0]
+    income = sum(actions_income)
+    profit_total = (income / invest) * 100
 
     print("\n invest : " + str(round(invest, 2)) + " $")
     print(" income : " + str(round(income, 2)) + " $")
-    print(" profit : " + "+" + str(round(profit - 100, 2)) + " %")
+    print(" profit : " + "+" + str(round(profit_total - 100, 2)) + " %")
     print("\n------")
 
 
@@ -106,11 +111,11 @@ def main():
     table_actions = open_data()
     start = time.time()
     combinations, dicts = find_all_combinations(table_actions, invest_max)
-    solution, sorted_dict = calc_all_profit(combinations, dicts, table_actions)
+    solution = calc_all_profit(combinations, dicts, table_actions)
 
     end = time.time()
 
-    print_solution(solution, sorted_dict)
+    print_solution(solution)
 
     print("\n" + str(end - start) + " seconds")
     print(str(process.memory_info().rss) + " bytes")
